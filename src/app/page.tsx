@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 export default function Home() {
   return (
@@ -11,17 +12,11 @@ export default function Home() {
               <div className="text-2xl font-bold text-indigo-600">🏫 SchoolSaaS</div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/auth/signin" 
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Login
+              <Link href="/auth/login">
+                <Button variant="ghost">Login</Button>
               </Link>
-              <Link 
-                href="/auth/signup" 
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
-              >
-                Try Free
+              <Link href="/auth/setup">
+                <Button>Try Free</Button>
               </Link>
             </div>
           </div>
@@ -40,17 +35,11 @@ export default function Home() {
             Manage students, teachers, finances, and communication all in one place.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/auth/signup" 
-              className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition duration-200"
-            >
-              Start Free Trial
+            <Link href="/auth/setup">
+              <Button size="lg">Start Free Trial</Button>
             </Link>
-            <Link 
-              href="/demo" 
-              className="border border-indigo-600 text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition duration-200"
-            >
-              Watch Demo
+            <Link href="/demo">
+              <Button variant="outline" size="lg">Watch Demo</Button>
             </Link>
           </div>
         </div>
@@ -102,11 +91,8 @@ export default function Home() {
           <p className="text-xl text-gray-600 mb-8">
             Join hundreds of schools already using SchoolSaaS to streamline their operations.
           </p>
-          <Link 
-            href="/auth/signup" 
-            className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition duration-200"
-          >
-            Get Started Today
+          <Link href="/auth/setup">
+            <Button size="lg">Get Started Today</Button>
           </Link>
         </div>
       </main>
