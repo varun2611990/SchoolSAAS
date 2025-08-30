@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create route with stops in a transaction
-    const route = await prisma.$transaction(async (tx) => {
+    const route = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const createdRoute = await tx.route.create({
         data: {
           busId,
