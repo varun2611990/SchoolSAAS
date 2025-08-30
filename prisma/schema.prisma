@@ -100,6 +100,7 @@ model School {
   students        Student[]
   teachers        Teacher[]
   parents         Parent[]
+  drivers         Driver[]
   feeStructures   FeeStructure[]
   buses           Bus[]
   libraryItems    LibraryItem[]
@@ -475,58 +476,175 @@ model Payment {
 
 // Transport Management
 model Bus {
-  id           String   @id @default(cuid())
-  schoolId     String
-  number       String
-  capacity     Int
-  driverName   String
-  driverPhone  String
-  assistantName String?
-  assistantPhone String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String   @id @default(cuid())
+  schoolId          String
+  number            String
+  registrationNumber String
+  model             String?
+  capacity          Int
+  manufacturingYear Int?
+  fuelType          String?
+  insuranceExpiry   DateTime?
+  fitnessExpiry     DateTime?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  school       School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school            School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   // Relationships
-  routes       Route[]
+  routes            Route[]
+  maintenanceLogs   MaintenanceLog[]
+  drivers           BusDriver[]
 
   @@unique([schoolId, number])
+  @@unique([registrationNumber])
   @@map("buses")
 }
 
-model Route {
+model Driver {
+  id               String   @id @default(cuid())
+  schoolId         String
+  employeeId       String
+  name             String
+  phone            String
+  email            String?
+  licenseNumber    String
+  licenseExpiry    DateTime
+  dateOfJoining    DateTime
+  address          String?
+  emergencyContact String?
+  salary           Decimal?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  school           School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  // Relationships
+  buses            BusDriver[]
+  attendance       DriverAttendance[]
+  incidentReports  IncidentReport[]
+
+  @@unique([schoolId, employeeId])
+  @@unique([licenseNumber])
+  @@map("drivers")
+}
+
+model BusDriver {
   id        String   @id @default(cuid())
   busId     String
-  name      String
-  startTime String   // HH:MM format
-  endTime   String   // HH:MM format
+  driverId  String
+  role      DriverRole @default(DRIVER)
+  assignedAt DateTime @default(now())
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   bus       Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@unique([busId, driverId])
+  @@map("bus_drivers")
+}
+
+model DriverAttendance {
+  id        String          @id @default(cuid())
+  driverId  String
+  date      DateTime        @db.Date
+  status    AttendanceStatus
+  remarks   String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  driver    Driver          @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@unique([driverId, date])
+  @@map("driver_attendance")
+}
+
+model MaintenanceLog {
+  id            String          @id @default(cuid())
+  busId         String
+  type          MaintenanceType
+  description   String
+  cost          Decimal?
+  serviceDate   DateTime
+  nextServiceDate DateTime?
+  vendor        String?
+  isCompleted   Boolean         @default(false)
+  remarks       String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  bus           Bus             @relation(fields: [busId], references: [id], onDelete: Cascade)
+
+  @@map("maintenance_logs")
+}
+
+model IncidentReport {
+  id          String         @id @default(cuid())
+  driverId    String?
+  busId       String?
+  routeId     String?
+  type        IncidentType
+  description String
+  severity    IncidentSeverity
+  reportedAt  DateTime       @default(now())
+  resolvedAt  DateTime?
+  status      IncidentStatus @default(OPEN)
+  location    String?
+  actionTaken String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  driver      Driver?        @relation(fields: [driverId], references: [id])
+  route       Route?         @relation(fields: [routeId], references: [id])
+
+  @@map("incident_reports")
+}
+
+model Route {
+  id          String   @id @default(cuid())
+  busId       String
+  name        String
+  description String?
+  startTime   String   // HH:MM format
+  endTime     String   // HH:MM format
+  distance    Decimal?
+  estimatedDuration Int? // in minutes
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bus         Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
 
   // Relationships
-  stops     Stop[]
+  stops               Stop[]
   transportAssignments TransportAssignment[]
+  incidentReports     IncidentReport[]
+  pickupDropStatuses  PickupDropStatus[]
 
   @@map("routes")
 }
 
 model Stop {
-  id        String   @id @default(cuid())
-  routeId   String
-  name      String
-  location  String?
-  arrivalTime String // HH:MM format
-  sequence  Int
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  routeId     String
+  name        String
+  address     String?
+  latitude    Decimal?
+  longitude   Decimal?
+  arrivalTime String   // HH:MM format
+  sequence    Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  route     Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  route       Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  // Relationships
+  transportAssignments TransportAssignment[]
 
   @@unique([routeId, sequence])
   @@map("stops")
@@ -537,15 +655,74 @@ model TransportAssignment {
   studentId String
   routeId   String
   stopId    String?
+  boardingPoint String? // "PICKUP" or "DROP" or "BOTH"
+  feeAmount Decimal?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   route     Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  stop      Stop?    @relation(fields: [stopId], references: [id])
+
+  // Relationships
+  pickupDropStatuses PickupDropStatus[]
+  transportFees      TransportFee[]
 
   @@unique([studentId, routeId])
   @@map("transport_assignments")
+}
+
+model PickupDropStatus {
+  id          String              @id @default(cuid())
+  assignmentId String
+  routeId     String
+  date        DateTime            @db.Date
+  pickupStatus PickupDropStatusEnum?
+  pickupTime  DateTime?
+  dropStatus  PickupDropStatusEnum?
+  dropTime    DateTime?
+  remarks     String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  assignment  TransportAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  route       Route              @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, date])
+  @@map("pickup_drop_statuses")
+}
+
+model TransportFee {
+  id           String   @id @default(cuid())
+  assignmentId String
+  academicYear String
+  amount       Decimal
+  frequency    FeeFrequency
+  dueDate      DateTime
+  paidAmount   Decimal? @default(0)
+  status       InvoiceStatus @default(PENDING)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignment   TransportAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@map("transport_fees")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?            // Additional data as JSON
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+
+  @@map("notifications")
 }
 
 // Library Management
@@ -808,4 +985,61 @@ enum SubscriptionStatus {
   CANCELLED
   PAST_DUE
   UNPAID
+}
+
+enum DriverRole {
+  DRIVER
+  ASSISTANT
+  CONDUCTOR
+}
+
+enum MaintenanceType {
+  ROUTINE
+  REPAIR
+  INSPECTION
+  EMERGENCY
+  INSURANCE
+  FITNESS
+}
+
+enum IncidentType {
+  ACCIDENT
+  BREAKDOWN
+  DELAY
+  SAFETY
+  DISCIPLINE
+  MEDICAL
+  WEATHER
+  OTHER
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum PickupDropStatusEnum {
+  COMPLETED
+  MISSED
+  CANCELLED
+  DELAYED
+}
+
+enum NotificationType {
+  TRANSPORT_PICKUP
+  TRANSPORT_DROP
+  TRANSPORT_DELAY
+  TRANSPORT_INCIDENT
+  FEE_DUE
+  GENERAL
+  EMERGENCY
 }
