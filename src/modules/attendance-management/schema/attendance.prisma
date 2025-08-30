@@ -1,0 +1,142 @@
+// Attendance Management Module - Prisma Schema
+
+// Enums for Attendance Management
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  EXCUSED
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum LeaveType {
+  SICK
+  PERSONAL
+  EMERGENCY
+  VACATION
+  MEDICAL
+  FAMILY
+  OTHER
+}
+
+// Core attendance tracking model
+model Attendance {
+  id          String            @id @default(cuid())
+  workspaceId String
+  studentId   String
+  classId     String
+  date        DateTime          @db.Date
+  status      AttendanceStatus
+  checkedInAt DateTime?
+  checkedOutAt DateTime?
+  remarks     String?
+  markedBy    String           // User ID of who marked attendance
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  isDeleted   Boolean          @default(false)
+
+  // Relationships
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id])
+  student     Student          @relation(fields: [studentId], references: [id])
+  class       Class            @relation(fields: [classId], references: [id])
+  markedByUser User            @relation(fields: [markedBy], references: [id])
+
+  @@unique([studentId, date, classId])
+  @@index([workspaceId, date])
+  @@index([studentId, date])
+  @@index([classId, date])
+  @@map("attendance")
+}
+
+// Leave request management
+model LeaveRequest {
+  id          String      @id @default(cuid())
+  workspaceId String
+  studentId   String
+  type        LeaveType
+  startDate   DateTime    @db.Date
+  endDate     DateTime    @db.Date
+  reason      String
+  status      LeaveStatus @default(PENDING)
+  appliedBy   String      // Parent/Guardian User ID
+  approvedBy  String?     // Teacher/Admin User ID
+  approvedAt  DateTime?
+  rejectedAt  DateTime?
+  rejectionReason String?
+  documents   String[]    // Array of document URLs
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  isDeleted   Boolean     @default(false)
+
+  // Relationships
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+  student     Student     @relation(fields: [studentId], references: [id])
+  appliedByUser User      @relation("LeaveRequestAppliedBy", fields: [appliedBy], references: [id])
+  approvedByUser User?    @relation("LeaveRequestApprovedBy", fields: [approvedBy], references: [id])
+
+  @@index([workspaceId, status])
+  @@index([studentId, status])
+  @@index([startDate, endDate])
+  @@map("leave_requests")
+}
+
+// Parent/Guardian notification preferences
+model AttendanceNotificationSettings {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  parentId        String
+  studentId       String
+  emailEnabled    Boolean  @default(true)
+  smsEnabled      Boolean  @default(false)
+  pushEnabled     Boolean  @default(true)
+  dailySummary    Boolean  @default(true)
+  absentAlert     Boolean  @default(true)
+  lateAlert       Boolean  @default(false)
+  reminderTime    String?  // Time for daily summary (HH:MM format)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  workspace       Workspace @relation(fields: [workspaceId], references: [id])
+  parent          Parent    @relation(fields: [parentId], references: [id])
+  student         Student   @relation(fields: [studentId], references: [id])
+
+  @@unique([parentId, studentId])
+  @@index([workspaceId])
+  @@map("attendance_notification_settings")
+}
+
+// Attendance summary for quick reporting
+model AttendanceSummary {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  studentId       String
+  classId         String
+  month           Int      // 1-12
+  year            Int
+  totalDays       Int
+  presentDays     Int
+  absentDays      Int
+  lateDays        Int
+  halfDays        Int
+  excusedDays     Int
+  attendancePercentage Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  workspace       Workspace @relation(fields: [workspaceId], references: [id])
+  student         Student   @relation(fields: [studentId], references: [id])
+  class           Class     @relation(fields: [classId], references: [id])
+
+  @@unique([studentId, classId, month, year])
+  @@index([workspaceId, month, year])
+  @@map("attendance_summary")
+}

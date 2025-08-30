@@ -47,11 +47,88 @@ export default function Home() {
               Start Free Trial
             </Link>
             <Link 
-              href="/demo" 
+              href="/modules" 
               className="border border-indigo-600 text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition duration-200"
+            >
+              View Modules
+            </Link>
+            <Link 
+              href="/demo" 
+              className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-50 transition duration-200"
             >
               Watch Demo
             </Link>
+          </div>
+        </div>
+
+        {/* Modules Overview */}
+        <div className="mt-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Comprehensive Module Suite
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our platform includes 8 specialized modules designed to handle every aspect of school management
+            </p>
+            <Link 
+              href="/modules" 
+              className="inline-flex items-center mt-4 text-indigo-600 hover:text-indigo-800 font-medium"
+            >
+              View All Modules
+              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">✅</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Attendance Management</h3>
+              <p className="text-xs text-gray-600">Digital tracking & notifications</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">📊</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Financial Accounting</h3>
+              <p className="text-xs text-gray-600">Complete accounting system</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">💰</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Fee Management</h3>
+              <p className="text-xs text-gray-600">Online payments & tracking</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">📚</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Library Management</h3>
+              <p className="text-xs text-gray-600">Digital catalog & tracking</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">📝</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Exam & Results</h3>
+              <p className="text-xs text-gray-600">Scheduling & grade management</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">👥</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Student Information</h3>
+              <p className="text-xs text-gray-600">Centralized student profiles</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">🚌</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Bus Transport & GPS</h3>
+              <p className="text-xs text-gray-600">Fleet & route management</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="text-2xl mb-2">📋</div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Online Registration</h3>
+              <p className="text-xs text-gray-600">Digital admission process</p>
+            </div>
           </div>
         </div>
 
