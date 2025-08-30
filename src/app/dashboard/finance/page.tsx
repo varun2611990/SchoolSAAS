@@ -132,13 +132,13 @@ export default function FinancePage() {
     {
       id: 'date' as keyof Transaction,
       header: 'Date',
-      cell: (value: any) => new Date(value).toLocaleDateString(),
+      cell: (value: Transaction[keyof Transaction]) => new Date(value as string).toLocaleDateString(),
       sortable: true
     },
     {
       id: 'studentName' as keyof Transaction,
       header: 'Student',
-      cell: (value: any, row: Transaction) => (
+      cell: (_value: Transaction[keyof Transaction], row: Transaction) => (
         <div>
           <div className="font-medium">{row.studentName}</div>
           <div className="text-sm text-gray-500">{row.studentId}</div>
@@ -155,10 +155,10 @@ export default function FinancePage() {
     {
       id: 'amount' as keyof Transaction,
       header: 'Amount',
-      cell: (value: any, row: Transaction) => (
-        <span className={`font-medium ${getAmountColor(value, row.status)}`}>
-          ${Math.abs(value).toFixed(2)}
-          {value < 0 && ' (Refund)'}
+      cell: (value: Transaction[keyof Transaction], row: Transaction) => (
+        <span className={`font-medium ${getAmountColor(value as number, row.status)}`}>
+          ${Math.abs(value as number).toFixed(2)}
+          {(value as number) < 0 && ' (Refund)'}
         </span>
       ),
       sortable: true
@@ -166,8 +166,8 @@ export default function FinancePage() {
     {
       id: 'status' as keyof Transaction,
       header: 'Status',
-      cell: (value: any) => (
-        <Badge variant={getStatusBadgeVariant(value) as any}>
+      cell: (value: Transaction[keyof Transaction]) => (
+        <Badge variant={getStatusBadgeVariant(value as string) as "default" | "secondary" | "destructive" | "outline"}>
           {value}
         </Badge>
       ),
@@ -183,7 +183,7 @@ export default function FinancePage() {
     {
       id: 'actions' as keyof Transaction,
       header: 'Actions',
-      cell: (value: any, row: Transaction) => (
+      cell: (_value: Transaction[keyof Transaction], _row: Transaction) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">
@@ -315,7 +315,7 @@ export default function FinancePage() {
                         <div className={`font-medium text-sm ${getAmountColor(transaction.amount, transaction.status)}`}>
                           ${Math.abs(transaction.amount).toFixed(2)}
                         </div>
-                        <Badge variant={getStatusBadgeVariant(transaction.status) as any} className="text-xs">
+                        <Badge variant={getStatusBadgeVariant(transaction.status) as "default" | "secondary" | "destructive" | "outline"} className="text-xs">
                           {transaction.status}
                         </Badge>
                       </div>

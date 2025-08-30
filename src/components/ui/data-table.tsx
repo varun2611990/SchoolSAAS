@@ -4,7 +4,6 @@ import * as React from "react"
 import { Input } from "./input"
 import { Button } from "./button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
-import { Badge } from "./badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table"
 import { Card, CardContent, CardHeader, CardTitle } from "./card"
 import { 
@@ -12,8 +11,7 @@ import {
   ChevronRightIcon, 
   ChevronsLeftIcon, 
   ChevronsRightIcon,
-  Search,
-  Filter
+  Search
 } from "lucide-react"
 
 interface Column<T> {
@@ -34,7 +32,7 @@ interface DataTableProps<T> {
   className?: string
 }
 
-export function DataTable<T extends Record<string, any>>({
+export function DataTable<T extends Record<string, string | number | boolean | null | undefined>>({
   data,
   columns,
   searchable = true,
@@ -84,6 +82,11 @@ export function DataTable<T extends Record<string, any>>({
     return [...filteredData].sort((a, b) => {
       const aValue = a[sortConfig.key!]
       const bValue = b[sortConfig.key!]
+
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0
+      if (aValue == null) return 1
+      if (bValue == null) return -1
 
       if (aValue < bValue) {
         return sortConfig.direction === 'asc' ? -1 : 1
@@ -153,7 +156,7 @@ export function DataTable<T extends Record<string, any>>({
                   <SelectContent>
                     <SelectItem value="all">All {column.header}</SelectItem>
                     {Array.from(new Set(data.map(row => String(row[column.id]))))
-                      .filter(value => value && value !== 'undefined' && value !== 'null')
+                      .filter(value => value && value !== 'undefined' && value !== 'null' && value.trim() !== '')
                       .map(value => (
                         <SelectItem key={value} value={value}>
                           {value}

@@ -7,18 +7,15 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import {
-  Calendar,
   Save,
   Users,
   UserCheck,
   UserX,
   Clock,
   Download,
-  Filter,
   CheckCircle,
   XCircle
 } from 'lucide-react'
@@ -119,7 +116,6 @@ export default function AttendancePage() {
   const [selectedClass, setSelectedClass] = useState('Grade 10')
   const [selectedSection, setSelectedSection] = useState('A')
   const [students, setStudents] = useState<Student[]>(mockStudents)
-  const [selectAll, setSelectAll] = useState(false)
 
   const updateAttendance = (studentId: number, status: AttendanceStatus) => {
     setStudents(prev => prev.map(student => 

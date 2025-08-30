@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { DataTable } from '@/components/ui/data-table'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
   Plus, 
   MoreHorizontal, 
@@ -153,7 +153,7 @@ export default function StudentsPage() {
     {
       id: 'name' as keyof Student,
       header: 'Student',
-      cell: (value: any, row: Student) => (
+      cell: (_value: Student[keyof Student], row: Student) => (
         <div className="flex items-center space-x-3">
           <Avatar className="h-8 w-8">
             <AvatarImage src={row.avatar || ''} alt={row.name} />
@@ -187,9 +187,9 @@ export default function StudentsPage() {
     {
       id: 'status' as keyof Student,
       header: 'Status',
-      cell: (value: any) => (
-        <Badge variant={getStatusBadgeVariant(value) as any} className="flex items-center space-x-1">
-          {getStatusIcon(value)}
+      cell: (value: Student[keyof Student]) => (
+        <Badge variant={getStatusBadgeVariant(value as string) as "default" | "secondary" | "destructive" | "outline"} className="flex items-center space-x-1">
+          {getStatusIcon(value as string)}
           <span>{value}</span>
         </Badge>
       ),
@@ -199,13 +199,13 @@ export default function StudentsPage() {
     {
       id: 'admissionDate' as keyof Student,
       header: 'Admission Date',
-      cell: (value: any) => new Date(value).toLocaleDateString(),
+      cell: (value: Student[keyof Student]) => new Date(value as string).toLocaleDateString(),
       sortable: true
     },
     {
       id: 'actions' as keyof Student,
       header: 'Actions',
-      cell: (value: any, row: Student) => (
+      cell: (_value: Student[keyof Student], _row: Student) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">
