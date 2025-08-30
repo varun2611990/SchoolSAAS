@@ -1,0 +1,115 @@
+// Financial Accounting Module - Prisma Schema
+
+// Enums for Financial Accounting
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  INCOME
+  EXPENSE
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+// Chart of Accounts
+model Account {
+  id          String      @id @default(cuid())
+  workspaceId String
+  code        String      // Account code (e.g., 1000, 2000)
+  name        String
+  type        AccountType
+  parentId    String?     // For hierarchical accounts
+  isActive    Boolean     @default(true)
+  balance     Decimal     @default(0) @db.Decimal(12, 2)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  isDeleted   Boolean     @default(false)
+
+  // Relationships
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+  parent      Account?    @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children    Account[]   @relation("AccountHierarchy")
+  transactions TransactionEntry[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId, type])
+  @@map("accounts")
+}
+
+// Financial Transactions (Journal Entries)
+model Transaction {
+  id          String            @id @default(cuid())
+  workspaceId String
+  reference   String            // Transaction reference number
+  description String
+  date        DateTime          @db.Date
+  status      TransactionStatus @default(PENDING)
+  totalAmount Decimal           @db.Decimal(12, 2)
+  createdBy   String
+  approvedBy  String?
+  approvedAt  DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  isDeleted   Boolean           @default(false)
+
+  // Relationships
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+  createdByUser User            @relation("TransactionCreatedBy", fields: [createdBy], references: [id])
+  approvedByUser User?          @relation("TransactionApprovedBy", fields: [approvedBy], references: [id])
+  entries     TransactionEntry[]
+
+  @@index([workspaceId, date])
+  @@index([workspaceId, status])
+  @@map("transactions")
+}
+
+// Transaction Entries (Double-entry bookkeeping)
+model TransactionEntry {
+  id            String          @id @default(cuid())
+  transactionId String
+  accountId     String
+  type          TransactionType // DEBIT or CREDIT
+  amount        Decimal         @db.Decimal(12, 2)
+  description   String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  // Relationships
+  transaction   Transaction     @relation(fields: [transactionId], references: [id])
+  account       Account         @relation(fields: [accountId], references: [id])
+
+  @@index([transactionId])
+  @@index([accountId])
+  @@map("transaction_entries")
+}
+
+// Financial Reports
+model FinancialReport {
+  id          String   @id @default(cuid())
+  workspaceId String
+  type        String   // BALANCE_SHEET, INCOME_STATEMENT, etc.
+  period      String   // MONTHLY, QUARTERLY, YEARLY
+  startDate   DateTime @db.Date
+  endDate     DateTime @db.Date
+  data        Json     // Report data in JSON format
+  generatedBy String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  generatedByUser User  @relation(fields: [generatedBy], references: [id])
+
+  @@index([workspaceId, type, period])
+  @@map("financial_reports")
+}
