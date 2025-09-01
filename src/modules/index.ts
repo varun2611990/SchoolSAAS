@@ -6,6 +6,9 @@ export * from './attendance-management/types';
 export { AttendanceProgress } from './attendance-management/components/ui/attendance-progress';
 export { AttendanceStatusSelect } from './attendance-management/components/ui/attendance-status-select';
 
+// Student Information System Module
+export * from './student-information-system';
+
 // Module Registry
 export const MODULES = [
   {
@@ -66,13 +69,13 @@ export const MODULES = [
   {
     id: 'student-information-system',
     name: 'Student Information System',
-    description: 'Centralized student profiles, guardian info, academic history',
+    description: 'Centralized student profiles, homework workflow, academic tracking',
     icon: '👥',
-    status: 'TODO',
-    progress: 0,
+    status: 'IN_PROGRESS',
+    progress: 35,
     path: '/modules/student-information-system',
-    entities: ['Student', 'Guardian', 'AcademicRecord'],
-    features: ['Profile management', 'Guardian tracking', 'Academic history', 'Document management']
+    entities: ['Student', 'Guardian', 'Homework', 'Grade', 'Timetable'],
+    features: ['Profile management', 'Homework workflow', 'Grade tracking', 'Timetable management', 'Parent communication']
   },
   {
     id: 'bus-transport-gps',
