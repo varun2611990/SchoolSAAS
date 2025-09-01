@@ -105,6 +105,7 @@ model School {
   buses           Bus[]
   libraryItems    LibraryItem[]
   inventoryItems  InventoryItem[]
+  homework        Homework[]
 
   @@map("schools")
 }
@@ -148,6 +149,7 @@ model Class {
   subjects    ClassSubject[]
   students    Student[]
   timetables  Timetable[]
+  homework    Homework[]
 
   @@unique([schoolId, academicYearId, name])
   @@map("classes")
@@ -188,6 +190,7 @@ model Subject {
   teachers    TeacherSubject[]
   grades      Grade[]
   timetables  Timetable[]
+  homework    Homework[]
 
   @@unique([schoolId, code])
   @@map("subjects")
@@ -238,6 +241,7 @@ model Student {
   transportAssignments TransportAssignment[]
   libraryIssues     LibraryIssue[]
   invoices          Invoice[]
+  homeworkSubmissions HomeworkSubmission[]
 
   @@unique([schoolId, rollNumber])
   @@unique([schoolId, admissionNumber])
@@ -267,6 +271,7 @@ model Teacher {
   timetables      Timetable[]
   leaves          Leave[]
   attendance      TeacherAttendance[]
+  homework        Homework[]
 
   @@unique([schoolId, employeeId])
   @@map("teachers")
@@ -711,6 +716,73 @@ model TransportFee {
   @@map("transport_fees")
 }
 
+// Homework & Assignment Management
+model Homework {
+  id          String   @id @default(cuid())
+  schoolId    String
+  classId     String
+  subjectId   String
+  teacherId   String
+  title       String
+  description String?
+  instructions String?
+  dueDate     DateTime
+  maxMarks    Decimal?
+  attachments String[] // Array of file URLs
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher     Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  // Relationships
+  submissions HomeworkSubmission[]
+  notifications HomeworkNotification[]
+
+  @@map("homework")
+}
+
+model HomeworkSubmission {
+  id          String              @id @default(cuid())
+  homeworkId  String
+  studentId   String
+  content     String?
+  attachments String[]            // Array of file URLs
+  status      HomeworkStatus      @default(PENDING)
+  submittedAt DateTime?
+  grade       Decimal?
+  maxGrade    Decimal?
+  feedback    String?
+  gradedAt    DateTime?
+  gradedBy    String?
+  isLate      Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  homework    Homework            @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  student     Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([homeworkId, studentId])
+  @@map("homework_submissions")
+}
+
+model HomeworkNotification {
+  id         String               @id @default(cuid())
+  homeworkId String
+  userId     String
+  type       HomeworkNotificationType
+  isRead     Boolean              @default(false)
+  readAt     DateTime?
+  createdAt  DateTime             @default(now())
+
+  homework   Homework             @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+
+  @@map("homework_notifications")
+}
+
 model Notification {
   id          String           @id @default(cuid())
   userId      String
@@ -1040,6 +1112,27 @@ enum NotificationType {
   TRANSPORT_DELAY
   TRANSPORT_INCIDENT
   FEE_DUE
+  HOMEWORK_ASSIGNED
+  HOMEWORK_SUBMITTED
+  HOMEWORK_GRADED
+  ATTENDANCE_ALERT
+  GRADE_PUBLISHED
   GENERAL
   EMERGENCY
+}
+
+enum HomeworkStatus {
+  PENDING
+  SUBMITTED
+  GRADED
+  RETURNED
+  LATE_SUBMISSION
+}
+
+enum HomeworkNotificationType {
+  ASSIGNMENT_CREATED
+  SUBMISSION_RECEIVED
+  GRADE_ASSIGNED
+  DUE_DATE_REMINDER
+  LATE_SUBMISSION
 }
