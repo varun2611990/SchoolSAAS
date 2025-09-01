@@ -1,6 +1,6 @@
 'use client';
 
-import { GradeRecord } from '../types';
+import { GradeRecord } from '../../types';
 import { format } from 'date-fns';
 
 interface GradeCardProps {

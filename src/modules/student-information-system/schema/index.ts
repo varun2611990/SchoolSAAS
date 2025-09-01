@@ -14,9 +14,8 @@ export const StudentRegistrationSchema = z.object({
   lastName: z.string().min(2, 'Last name must be at least 2 characters').max(50, 'Last name must be less than 50 characters'),
   email: z.string().email('Invalid email address'),
   phone: z.string().optional(),
-  dateOfBirth: z.date({
-    required_error: 'Date of birth is required',
-    invalid_type_error: 'Invalid date format'
+  dateOfBirth: z.date().refine(date => date != null, {
+    message: 'Date of birth is required'
   }),
   gender: GenderSchema,
   bloodGroup: z.string().optional(),
@@ -29,9 +28,8 @@ export const StudentRegistrationSchema = z.object({
   sectionId: z.string().optional(),
   rollNumber: z.string().min(1, 'Roll number is required'),
   admissionNumber: z.string().min(1, 'Admission number is required'),
-  admissionDate: z.date({
-    required_error: 'Admission date is required',
-    invalid_type_error: 'Invalid date format'
+  admissionDate: z.date().refine(date => date != null, {
+    message: 'Admission date is required'
   }),
 
   // Guardian Information
@@ -49,10 +47,7 @@ export const HomeworkCreationSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(100, 'Title must be less than 100 characters'),
   description: z.string().optional(),
   instructions: z.string().optional(),
-  dueDate: z.date({
-    required_error: 'Due date is required',
-    invalid_type_error: 'Invalid date format'
-  }).refine(date => date > new Date(), {
+  dueDate: z.date().refine(date => date > new Date(), {
     message: 'Due date must be in the future'
   }),
   maxMarks: z.number().positive('Max marks must be positive').optional(),
@@ -168,7 +163,7 @@ export const NotificationSchema = z.object({
   type: z.string().min(1, 'Notification type is required'),
   title: z.string().min(1, 'Title is required').max(100, 'Title must be less than 100 characters'),
   message: z.string().min(1, 'Message is required').max(500, 'Message must be less than 500 characters'),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.string(), z.unknown()).optional(),
 });
 
 // Type exports for use in components

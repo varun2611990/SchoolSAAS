@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { StudentProfile } from '../types';
+import { StudentProfile } from '../../types';
 
 interface StudentCardProps {
   student: StudentProfile;
@@ -21,6 +21,7 @@ export function StudentCard({ student, onSelect, isSelected = false }: StudentCa
     >
       <div className="flex items-center space-x-3">
         {student.workspaceUser?.user.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={student.workspaceUser.user.image}
             alt={student.workspaceUser.user.name || 'Student'}

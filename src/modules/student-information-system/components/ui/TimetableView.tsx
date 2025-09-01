@@ -1,6 +1,6 @@
 'use client';
 
-import { TimetableEntry } from '../types';
+import { TimetableEntry } from '../../types';
 
 interface TimetableViewProps {
   timetable: TimetableEntry[];
@@ -165,7 +165,7 @@ export function TimetableView({
           </div>
 
           {/* Time slots */}
-          {timeSlots.map((time, timeIndex) => (
+          {timeSlots.map((time) => (
             <div key={time} className="grid grid-cols-8 border-b">
               <div className="p-3 text-sm text-gray-600 bg-gray-50 border-r">
                 {formatTime(time)}

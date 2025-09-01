@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { HomeworkAssignment, HomeworkStatus } from '../types';
+import { HomeworkAssignment } from '../../types';
 import { format } from 'date-fns';
 
 interface HomeworkCardProps {

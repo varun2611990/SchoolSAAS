@@ -286,7 +286,7 @@ export interface NotificationInfo {
   type: string;
   title: string;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
   isRead: boolean;
   readAt?: Date;
   createdAt: Date;

@@ -21,12 +21,14 @@ import {
   Bell,
   ChevronDown,
   LogOut,
-  User
+  User,
+  GraduationCap
 } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, count: null },
   { name: 'Students', href: '/dashboard/students', icon: Users, count: 245 },
+  { name: 'SIS Module', href: '/dashboard/sis', icon: GraduationCap, count: null },
   { name: 'Teachers', href: '/dashboard/teachers', icon: UserCheck, count: 18 },
   { name: 'Parents', href: '/dashboard/parents', icon: Users, count: 198 },
   { name: 'Finance', href: '/dashboard/finance', icon: DollarSign, count: null },
